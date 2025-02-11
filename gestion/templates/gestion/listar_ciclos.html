@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2> Lista de CICLOS DE AHORRO </h2>
+<a href=" {% url "crear_ciclos" %} ">Nuevo ciclo</a>
+
+<ul>
+    {% for ciclo in ciclos %}
+    <li>       
+        {{ ciclo.nombre }} - Bs{{ ciclo.monto_total }}
+        <a href="{% url "editar_ciclo" ciclo.id %}">Editar</a>
+        <a href="{% url "eliminar_ciclo" ciclo.id %}">Eliminar</a>
+    </li>
+    {% endfor %}
+
+</ul>
+
+{% endblock  %}
