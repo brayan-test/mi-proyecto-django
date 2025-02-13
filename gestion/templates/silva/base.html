@@ -1,0 +1,40 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="en" {% block html_attribute %}{% endblock html_attribute %}>
+
+<head>
+  <meta charset="utf-8" />
+  <title> {% block title %}{% endblock title %} | Silva - Responsive Admin Dashboard Template</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A fully featured admin theme which can be used to build CRM, CMS, etc." />
+  <meta name="author" content="Zoyothemes" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  <!-- App favicon -->
+  <link rel="shortcut icon" href="{% static '/images/favicon.ico' %}">
+
+  {% block css %}
+  {% block extra_css %} {% endblock extra_css %}
+
+  <link href="{% static '/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+  <link href="{% static '/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+
+  {% endblock css %}
+</head>
+
+<body {% block body_attribute %}{% endblock body_attribute %}>
+
+  {% block preloader %}{% endblock %}
+
+  {% block content %}{% endblock content %}
+
+  {% block javascript %}
+  <script src="{% static '/js/vendors.min.js' %}"></script>
+  <script src="{% static '/js/app.min.js' %}"></script>
+
+  {% block extra_javascript %} {% endblock extra_javascript %}
+  {% endblock javascript %}
+
+</body>
+
+</html>

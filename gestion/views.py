@@ -1,12 +1,14 @@
 from django.shortcuts import render,redirect, get_object_or_404
 from .models import CicloAhorro, Aporte
 from .forms import CicloAhorroForm, AporteForm
+from django.contrib.auth.decorators import login_required
 
-# Create your views here.
+@login_required
 def listar_ciclos(request):
     ciclos = CicloAhorro.objects.all()
     return render(request,'gestion/listar_ciclos.html',{'ciclos':ciclos})
 
+@login_required
 def crear_ciclo(request):
     if request.method == 'POST':
         form = CicloAhorroForm(request.POST)
@@ -18,6 +20,7 @@ def crear_ciclo(request):
 
     return render(request, 'gestion/crear_ciclo.html',{'form':form})
 
+@login_required
 def editar_ciclo(request, ciclo_id):
     ciclo = get_object_or_404(CicloAhorro,id=ciclo_id)
     if request.method == 'POST':
@@ -49,3 +52,7 @@ def crear_aporte(request):
         form = AporteForm()
 
     return render(request, 'gestion/crear_aporte.html',{'form':form})
+
+
+def inicio(request):
+    return render(request, 'gestion/inicio.html')

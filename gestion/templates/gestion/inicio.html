@@ -1,0 +1,13 @@
+{% extends "silva/base.html" %}
+{% block content %}
+<h2> Bienvenidos al aplicación "Pasanacu" </h2>
+<p>Elige una de las siguientes opciones</p>
+
+<ul>
+    <li><a href=" {% url "listar_ciclos" %} ">Ver los ciclos disponibles</a></li>
+    <li><a href="#"></a>Ver los aportes</li>
+    <li><a href="#"></a>Ver usuarios</li>
+</ul>
+
+
+{% endblock  %}

@@ -4,10 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pasanacu APP</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
+        
+        <a href=" {% url "inicio" %} "> Inicio</a>
         <h1>Sistema PASANACU 1.0</h1>
+        {% if user.is_authenticated %}
+            <span> Bienvenido {{ user.username}} </span>
+        {% endif %}
+
+        <nav>
+            <a href=" {% url "login" %} ">Iniciar sesión</a>
+            <a href=" {% url "logout" %}  ">Cerrar sesión</a>
+        </nav>
+
     </header>
     <main>
         {% block content %}
