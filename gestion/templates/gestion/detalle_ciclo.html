@@ -1,0 +1,32 @@
+{% extends "silva/base.html" %}
+{% block content %}
+<h2> {{ ciclo.nombre }}</h2>
+<p>Monto a pagar cada periodo:{{ ciclo.monto_por_participante }} </p>
+<p>PERIODO:{{ ciclo.periodo }} </p>
+<p>Estado:{{ ciclo.estado }} </p>
+
+<h3>Participantes</h3>
+<table>
+    <thead>
+        <tr>
+            <th>Nombre de Usuario</th>
+            <th>Orden de pago</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for participante in participantes %}
+        <tr>
+            <td> {{ participante.usuario.username }} </td>
+            <td> participante.orden_pago|default:"No asignado"</td>
+        </tr>
+        {% empty %}
+            <td>Aún no hay participantes registrados en este Ciclo</td>
+        {% endfor %}
+    </tbody>
+
+
+</table>
+
+<a href=" {% url "agregar_participante" ciclo.id %} ">Agregar participante</a>
+
+{% endblock  %}
