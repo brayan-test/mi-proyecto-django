@@ -1,0 +1,12 @@
+{% extends "silva/base.html" %}
+
+{% block content %}
+<h2>Registrar Pago para el Ciclo: {{ ciclo.nombre }}</h2>
+<p>Próximo en recibir pago: <strong>{{ form.initial.usuario }}</strong></p>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Confirmar Pago</button>
+</form>
+<a href="{% url 'detalles_ciclo' ciclo.id %}" class="btn btn-secondary">Cancelar</a>
+{% endblock %}

@@ -48,14 +48,26 @@
                                 <td>{{ ciclo.nombre }}</td>
                                 <td>Bs.{{ ciclo.monto_por_participante }}</td>
                                 <td>{{ ciclo.periodo }}</td>
-                                <td>{{ ciclo.estado }}</td>
-                                <td> <a href="{% url "editar_ciclo" ciclo.id %}">Editar</a>
-                                    <a href="{% url "eliminar_ciclo" ciclo.id %}">Eliminar</a> 
+                                <td>
+                                {% if ciclo.estado == "PENDIENTE" %}
+                                    <span class="badge bg-warning-subtle text-warning fw-semibold rounded-pill">Pendiente</span>
+                                {% elif ciclo.estado == "FINALIZADO" %}
+                                    <span class="badge bg-success-subtle text-success fw-semibold rounded-pill">Finalizado</span>
+                                {% else %}
+                                    <span class="badge bg-secondary-subtle text-secondary fw-semibold rounded-pill">{{ ciclo.estado }}</span>
+                                {% endif %}
+                                </td>
+                                <td> <a href="{% url "editar_ciclo" ciclo.id %}"><i class="mdi mdi-pencil-outline fs-16 text-muted"></i></a>
+                                    <a href="{% url "eliminar_ciclo" ciclo.id %}"><i class="mdi mdi-delete fs-16 text-muted"></i></a> 
+
+
+
+
                                     <a href="{% url "detalles_ciclo" ciclo.id %}">Ver detalles</a> </td>
                             </tr>
                             {% empty %}
-                                <p>No hay un registro de ciclos</p>
-
+                                <h1>No hay un registro de ciclos</h1>
+                            
                             {% endfor %}
                         </tbody>
                     </table>

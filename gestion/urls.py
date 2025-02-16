@@ -8,9 +8,17 @@ urlpatterns = [
     path('ciclos/eliminar/<int:ciclo_id>',views.eliminar_ciclo,name='eliminar_ciclo'),
     path('ciclos/<int:ciclo_id>/',views.detalles_ciclo,name='detalles_ciclo'),
     path('ciclos/<int:ciclo_id>/agregar-participante/',views.agregar_participante,name='agregar_participante'),
-   
+    path('ciclos/<int:ciclo_id>/sortear/', views.sortear_orden, name='sortear_orden'),
+    path('ciclos/participante/<int:participante_id>/modificar/', views.modificar_orden, name='modificar_orden'),
+
+    path('participantes/<int:participante_id>/modificar/', views.modificar_orden, name='modificar_orden'),
+    path('participantes/<int:participante_id>/eliminar/', views.eliminar_participante, name='eliminar_participante'),
+
     path('aportes/',views.listar_aportes,name='listar_aportes'),
     path('aportes/crear',views.listar_aportes,name='listar_aportes'),
+
+    path('ciclos/<int:ciclo_id>/registrar-pago/', views.registrar_pago, name='registrar_pago'),
+
 
     path('',views.inicio,name='inicio'),
 

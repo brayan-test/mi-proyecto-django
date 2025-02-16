@@ -1,0 +1,14 @@
+{% extends "silva/base.html" %}
+{% block content %}
+<h2>Modificar Orden de Pago</h2>
+<p>Usuario: <strong>{{ participante.usuario.username }}</strong></p>
+<p>Ciclo: <strong>{{ participante.ciclo.nombre }}</strong></p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+</form>
+
+<a href="{% url 'detalles_ciclo' participante.ciclo.id %}" class="btn btn-secondary">Cancelar</a>
+{% endblock %}

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from random import shuffle
 # Create your models here.
 
 # Modelo para crear un USUARIO con roles
@@ -28,12 +29,21 @@ class CicloAhorro(models.Model):
 # Modelo intermedio para relacionar USUARIOS a CICLOAHORRO
 class ParticipanteCiclo(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    ciclo = models.ForeignKey(CicloAhorro, on_delete=models.CASCADE)
+    ciclo = models.ForeignKey(CicloAhorro, on_delete=models.CASCADE, related_name="participantes")
     fecha_registro = models.DateField(auto_now_add=True)
-    orden_pago = models.IntegerField(null=True, blank=True)
+    orden_pago = models.IntegerField(null=True, blank=True)  # Para definir el orden de pagos
 
     def __str__(self):
-        return f"{self.usuario.username} en {self.ciclo.nombre}"
+        return f"{self.usuario.username} en {self.ciclo.nombre} (Orden: {self.orden_pago})"
+
+    @classmethod
+    def sortear_orden(cls, ciclo_id):
+        """Sortea el orden de pago entre los participantes del ciclo"""
+        participantes = list(cls.objects.filter(ciclo_id=ciclo_id))
+        shuffle(participantes)  # Mezcla aleatoriamente los participantes
+        for index, participante in enumerate(participantes, start=1):
+            participante.orden_pago = index
+            participante.save()
     
 class Aporte(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
@@ -49,13 +59,24 @@ class Aporte(models.Model):
 class Pago(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     ciclo = models.ForeignKey(CicloAhorro, on_delete=models.CASCADE)
-
-    monto = models.DecimalField(max_digits=10,decimal_places=2)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
     fecha_pago = models.DateField(auto_now_add=True)
-    # Agregar lógica para pagar al participante, al realizar este pago cambiará el periodo
+
+    def save(self, *args, **kwargs):
+        """Verifica que el pago siga el orden de pago definido en el ciclo"""
+        participantes = ParticipanteCiclo.objects.filter(ciclo=self.ciclo).order_by('orden_pago')
+        siguiente_participante = participantes.first()  # El primero en la lista debe recibir el pago
+
+        if siguiente_participante.usuario != self.usuario:
+            raise ValueError("No puedes pagar a este usuario aún. Respeta el orden de pago.")
+
+        # Eliminar al participante que ya recibió el pago
+        siguiente_participante.delete()
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Pago a {self.usuario.username} de Bs{self.monto}"
+        return f"Pago a {self.usuario.username} de Bs{self.monto} en {self.ciclo.nombre}"
+
 
 
 
