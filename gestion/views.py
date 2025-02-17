@@ -1,9 +1,19 @@
 from django.shortcuts import render,redirect, get_object_or_404
-from .models import CicloAhorro, Aporte, ParticipanteCiclo
+from .models import CicloAhorro, Aporte, ParticipanteCiclo, Pago
 from .forms import CicloAhorroForm, AporteForm, ParticipanteCicloForm, OrdenPagoForm, PagoForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+
+import openpyxl
+from django.utils.timezone import now
+
+
 
 def inicio(request):
     return render(request, 'gestion/inicio.html')
@@ -142,3 +152,91 @@ def registrar_pago(request, ciclo_id):
         form = PagoForm(initial={'usuario': siguiente_participante.usuario, 'ciclo': ciclo, 'monto': ciclo.monto_por_participante})
 
     return render(request, 'gestion/registrar_pago.html', {'form': form, 'ciclo': ciclo})
+
+@login_required
+def generar_reporte_pdf(request, ciclo_id):
+    ciclo = get_object_or_404(CicloAhorro,id = ciclo_id)
+    pagos = Pago.objects.filter(ciclo = ciclo)
+
+    response = HttpResponse(content_type = 'gestion/pdf')
+    response["Content-Disposition"] = f"filename = Reporte_{ciclo.nombre}.pdf"
+
+    """    
+    p = canvas.Canvas(response, pagesize=letter)
+
+    p.setTitle(f"Reporte de Pagos Pasanacu - {ciclo.nombre}")
+
+    p.drawString(100,700,f"Reporte de Pagos del Ciclo: {ciclo.nombre} ")
+    p.drawString(100,680,f"Estado: {ciclo.estado} ")
+    p.drawString(100,660,f"Detalles del pago:")
+
+    y = 640
+
+    for pago in pagos:
+        p.drawString(120,y,f"{pago.usuario.username} Bs. {pago.monto} - {pago.fecha_pago}")
+        y -= 20
+
+    p.save()
+    """
+    # Creando el documento PDF para el reporte
+    pdf = SimpleDocTemplate(response,pagesize=letter)
+    elementos = []
+
+    # Agregando estilos
+    estilos = getSampleStyleSheet()
+    titulo = Paragraph(f"Reporte de pagos de {ciclo.nombre}",estilos['Title'])
+    estado = Paragraph(f"Estado del ciclo: {ciclo.estado}",estilos['Normal'])
+
+    elementos.append(titulo)
+    elementos.append(Spacer(1,12))
+    elementos.append(estado)
+    elementos.append(Spacer(1,12))
+
+    # Creando la lista para convertir a tabla
+    datos = [["Usuario","Monto (Bs)","Fecha de pago"]]
+
+    for pago in pagos:
+        datos.append([pago.usuario.username,f"Bs{pago.monto}",pago.fecha_pago.strftime("%d/%m%Y")])
+    
+    # Agregando estilos de tabbla
+    tabla = Table(datos)
+    tabla.setStyle(TableStyle([
+        ('BACKGROUND',(0,0),(-1,0),colors.green),
+        ('TEXTCOLOR',(0,0),(-1,0), colors.whitesmoke),
+        ('ALIGN',(0,0),(-1,-1),'CENTER'),
+        ('FONTNAME',(0,0),(-1,0),'Helvetica-Bold'),
+        ('GRID',(0,0),(-1,-1),1,colors.green)
+    ]))
+
+    elementos.append(tabla)
+    pdf.build(elementos)
+    return response
+
+@login_required
+def generar_reporte_excel(request,ciclo_id):
+    ciclo = get_object_or_404(CicloAhorro,id = ciclo_id)
+    pagos = Pago.objects.filter(ciclo = ciclo)
+
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+
+    sheet.title = f"Pagos_{ciclo.nombre}"
+
+    sheet.append(["Usuario","Monto (Bs)", "Fecha de Pago"])
+
+    for pago in pagos:
+        sheet.append([pago.usuario.username, pago.monto,pago.fecha_pago.strftime("%d/%m/%Y")])
+
+    response = HttpResponse(content_type = 'gestion/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response["Content-Disposition"] = f"filename = Reporte_{ciclo.nombre} {now().strftime("%d/%m/%Y")}.xlsx"
+    
+    workbook.save(response)
+
+    return response
+
+
+
+
+
+
+

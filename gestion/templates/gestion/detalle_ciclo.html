@@ -111,6 +111,9 @@
                         {% else %}
                             <p class="text-warning">Todos los pagos han sido realizados.</p>
                         {% endif %}
+
+                        <a href=" {% url 'reporte_pdf' ciclo.id %} " class="btn btn-danger">Descargar PDF</a>
+                        <a href=" {% url 'reporte_excel' ciclo.id %} " class="btn btn-primary">Descargar Excel</a>
                     </div>
                 </div>
             </div>
